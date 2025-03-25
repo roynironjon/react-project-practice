@@ -1,7 +1,20 @@
-import React, { useEffect } from "react";
+import React, { 
+  useEffect, 
+  useRef, 
+  useState  // This was missing in your original code
+} from "react";
 import "../styles/home.css";
+import { FaGithub, FaLinkedin, FaTwitter, FaInstagram } from "react-icons/fa";
+
 
 const Home = () => {
+  const canvasRef = useRef(null);
+  const cursorRef = useRef(null);
+  const followerRef = useRef(null);
+  const textRef = useRef(null);
+  const [profession, setProfession] = useState("");
+  const professions = ["Web Designer", "Developer", "Content Creator"];
+
   useEffect(() => {
     // Animation on scroll
     const animateOnScroll = () => {
@@ -17,33 +30,303 @@ const Home = () => {
     };
 
     window.addEventListener('scroll', animateOnScroll);
-    animateOnScroll(); // Run once on load
+    animateOnScroll();
 
-    return () => window.removeEventListener('scroll', animateOnScroll);
+    // Fireworks animation
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const fireworks = [];
+    const gravity = 0.05;
+    const minHeight = canvas.height * 0.2;
+
+    class Firework {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.speedY = Math.random() * -4 - 3;
+        this.exploded = false;
+        this.particles = [];
+      }
+
+      update() {
+        if (!this.exploded) {
+          this.y += this.speedY;
+          this.speedY += gravity;
+
+          if (this.speedY >= 0 || this.y <= minHeight) {
+            this.explode();
+          }
+        } else {
+          this.particles.forEach((particle, index) => {
+            particle.update();
+            if (particle.alpha <= 0) {
+              this.particles.splice(index, 1);
+            }
+          });
+        }
+      }
+
+      draw() {
+        if (!this.exploded) {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+          ctx.fillStyle = this.color;
+          ctx.fill();
+          ctx.closePath();
+        } else {
+          this.particles.forEach((particle) => particle.draw());
+        }
+      }
+
+      explode() {
+        this.exploded = true;
+        const colors = ["#ff4747", "#ffdd57", "#47ff47", "#4747ff", "#ff47ff"];
+        for (let i = 0; i < 80; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = Math.random() * 3 + 2;
+          const dx = Math.cos(angle) * speed;
+          const dy = Math.sin(angle) * speed;
+          const particleColor = colors[Math.floor(Math.random() * colors.length)];
+          this.particles.push(new Particle(this.x, this.y, dx, dy, particleColor));
+        }
+      }
+    }
+
+    class Particle {
+      constructor(x, y, dx, dy, color) {
+        this.x = x;
+        this.y = y;
+        this.dx = dx;
+        this.dy = dy;
+        this.size = Math.random() * 3 + 2;
+        this.color = color;
+        this.alpha = 1;
+      }
+
+      update() {
+        this.x += this.dx;
+        this.y += this.dy;
+        this.dy += gravity / 2;
+        this.alpha -= 0.02;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function createFirework() {
+      const x = Math.random() * canvas.width;
+      const y = canvas.height;
+      const colors = ["#ff4747", "#ffdd57", "#47ff47", "#4747ff", "#ff47ff"];
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      fireworks.push(new Firework(x, y, color));
+    }
+
+    function animateFireworks() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.2)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      fireworks.forEach((firework, index) => {
+        firework.update();
+        firework.draw();
+        if (firework.exploded && firework.particles.length === 0) {
+          fireworks.splice(index, 1);
+        }
+      });
+
+      requestAnimationFrame(animateFireworks);
+    }
+
+    // Custom cursor animation
+    const cursor = cursorRef.current;
+    const follower = followerRef.current;
+    
+    let posX = 0, posY = 0;
+    let mouseX = 0, mouseY = 0;
+    
+    const animateCursor = () => {
+      posX += (mouseX - posX) / 9;
+      posY += (mouseY - posY) / 9;
+      
+      cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+      follower.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
+      
+      requestAnimationFrame(animateCursor);
+    };
+    
+    const handleMouseMove = (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    animateCursor();
+
+    // Interactive elements effect
+    const interactiveElements = document.querySelectorAll('a, button, .service-card, .category-card');
+    
+    interactiveElements.forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        cursor.classList.add('active');
+        follower.classList.add('active');
+      });
+      el.addEventListener('mouseleave', () => {
+        cursor.classList.remove('active');
+        follower.classList.remove('active');
+      });
+    });
+
+    // Typewriter effect
+    let currentProfessionIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 150;
+
+    const typeWriter = () => {
+      const currentProfession = professions[currentProfessionIndex];
+      
+      if (isDeleting) {
+        setProfession(currentProfession.substring(0, charIndex - 1));
+        charIndex--;
+        typingSpeed = 50;
+      } else {
+        setProfession(currentProfession.substring(0, charIndex + 1));
+        charIndex++;
+        typingSpeed = 150;
+      }
+
+      if (!isDeleting && charIndex === currentProfession.length) {
+        typingSpeed = 2000;
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        currentProfessionIndex = (currentProfessionIndex + 1) % professions.length;
+        typingSpeed = 500;
+      }
+
+      const timeoutId = setTimeout(typeWriter, typingSpeed);
+      
+      return () => clearTimeout(timeoutId);
+    };
+
+    typeWriter();
+
+    // Circle animation around image
+    const circle = document.querySelector('.hero-image-circle');
+    if (circle) {
+      let rotation = 0;
+      const animateCircle = () => {
+        rotation += 0.5;
+        circle.style.transform = `rotate(${rotation}deg)`;
+        requestAnimationFrame(animateCircle);
+      };
+      animateCircle();
+    }
+
+    const fireworkInterval = setInterval(createFirework, 1000);
+    const animationId = requestAnimationFrame(animateFireworks);
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      clearInterval(fireworkInterval);
+      cancelAnimationFrame(animationId);
+      window.removeEventListener("scroll", animateOnScroll);
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
   }, []);
 
   return (
     <div className="home-page">
-      {/* Hero Section with Snowfall Effect */}
+      {/* Custom Cursor Elements */}
+      <div className="custom-cursor" ref={cursorRef}></div>
+      <div className="cursor-follower" ref={followerRef}></div>
+      
+      {/* Hero Section with Fireworks */}
       <section className="hero-section">
-        <div className="snowfall">
-          {[...Array(50)].map((_, i) => (
-            <div key={i} className="snowflake" style={{
-              left: `${Math.random() * 100}%`,
-              animationDuration: `${Math.random() * 3 + 2}s`,
-              animationDelay: `${Math.random() * 5}s`,
-              opacity: Math.random() * 0.5 + 0.5
-            }}></div>
-          ))}
+        <canvas 
+          ref={canvasRef} 
+          className="fireworks-canvas"
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 0
+          }}
+        />
+        
+        <div className="hero-container">
+          <div className="hero-content">
+            <div className="hero-text">
+              <h6 className="hero-subtitle">Hi, I'm</h6>
+              <h1 className="hero-title">Roy-DRN</h1>
+              <h2 className="hero-profession">
+                Professional <span ref={textRef}>{profession}</span>
+                <span className="type-cursor">|</span>
+              </h2>
+              <p className="hero-description">
+                Innovative solutions for your digital transformation. 
+                Creating beautiful, functional websites and applications 
+                that drive results.
+              </p>
+              
+              <div className="hero-social">
+                <a href="#" className="social-icon"><FaGithub /></a>
+                <a href="#" className="social-icon"><FaLinkedin /></a>
+                <a href="#" className="social-icon"><FaTwitter /></a>
+                <a href="#" className="social-icon"><FaInstagram /></a>
+              </div>
+              
+              <button className="hero-btn">
+                Get Started
+                <span className="btn-hover-effect"></span>
+              </button>
+            </div>
+            
+            <div className="hero-image">
+              <div className="hero-image-circle"></div>
+              <div className="hero-image-inner">
+                <img 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" 
+                  alt="Roy-DRN" 
+                  className="profile-image"
+                />
+              </div>
+              <div className="hero-image-dots">
+                {[...Array(12)].map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="dot" 
+                    style={{
+                      transform: `rotate(${i * 30}deg) translateY(-120px)`,
+                      animationDelay: `${i * 0.1}s`
+                    }}
+                  ></div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="hero-content">
-          <h1 className="hero-title">Welcome to <span>Roy-DRN</span></h1>
-          <p className="hero-subtitle">Innovative solutions for your digital transformation</p>
-          <button className="hero-btn">
-            Get Started
-            <span className="btn-hover-effect"></span>
-          </button>
-        </div>
+        
         <div className="scroll-indicator">
           <div className="mouse">
             <div className="wheel"></div>
