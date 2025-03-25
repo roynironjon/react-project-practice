@@ -1,10 +1,8 @@
-import React, { 
-  useEffect, 
-  useRef, 
-  useState  // This was missing in your original code
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../styles/home.css";
 import { FaGithub, FaLinkedin, FaTwitter, FaInstagram } from "react-icons/fa";
+// Correct import (assuming home.jsx is in src/pages/)
+import logo from '../assets/images/logo2.png';
 
 
 const Home = () => {
@@ -276,13 +274,15 @@ const Home = () => {
         
         <div className="hero-container">
           <div className="hero-content">
-            <div className="hero-text">
+            <div className="hero-text text-start">
               <h6 className="hero-subtitle">Hi, I'm</h6>
-              <h1 className="hero-title">Roy-DRN</h1>
+              <h1 className="hero-title">Roy</h1>
               <h2 className="hero-profession">
                 Professional <span ref={textRef}>{profession}</span>
                 <span className="type-cursor">|</span>
+
               </h2>
+
               <p className="hero-description">
                 Innovative solutions for your digital transformation. 
                 Creating beautiful, functional websites and applications 
@@ -306,7 +306,7 @@ const Home = () => {
               <div className="hero-image-circle"></div>
               <div className="hero-image-inner">
                 <img 
-                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80" 
+                  src={logo} 
                   alt="Roy-DRN" 
                   className="profile-image"
                 />

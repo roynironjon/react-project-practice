@@ -57,6 +57,7 @@
   position: relative;
   z-index: 2;
   padding: 0 20px;
+  top: -55px;
 }
 
 .hero-title {
