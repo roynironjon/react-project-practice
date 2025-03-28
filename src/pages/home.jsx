@@ -337,7 +337,7 @@ const Home = () => {
 
       {/* Services Section */}
       <section className="services-section">
-        <div className="section-header">
+        <div className="section-header text-center">
           <h2>Our <span>Services</span></h2>
           <p className="section-subtitle">We deliver excellence in every project</p>
         </div>
@@ -377,7 +377,7 @@ const Home = () => {
 
       {/* Categories Section */}
       <section className="categories-section">
-        <div className="section-header">
+        <div className="section-header text-center">
           <h2>Explore <span>Categories</span></h2>
           <p className="section-subtitle">Discover our areas of expertise</p>
         </div>
@@ -405,9 +405,9 @@ const Home = () => {
       <section className="about-section">
         <div className="about-content">
           <div className="about-text">
-            <div className="section-header">
-              <h2>About <span>Us</span></h2>
-              <p className="section-subtitle">Who we are and what we do</p>
+            <div className="section-header text-align-left">
+              <h2 claassName="section-title text-align-left">About <span>Us</span></h2>
+              <p className="section-subtitle text-align-left">Who we are and what we do</p>
             </div>
             <p>
               Roy-DRN is a team of passionate professionals dedicated to delivering innovative digital solutions. 
